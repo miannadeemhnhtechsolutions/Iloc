@@ -67,14 +67,14 @@ class ClientController extends Controller
     }
     public function update(Request $request){
         $validator = Validator::make($request->all(), [
-            "first_name"=>"required|min:3|max:50",
-            "last_name"=>"required|min:3|max:50",
-            "pet_name"=>"required|min:3|max:50",
-            "pet_breed"=>"required|min:3|max:50",
-            "pet_color"=>"required|min:3|max:50",
+            "first_name"=>"required|min:1|max:100",
+            "last_name"=>"required|min:1|max:100",
+            "pet_name"=>"required|min:1|max:100",
+            "pet_breed"=>"required|min:1|max:100",
+            "pet_color"=>"required|min:1|max:100",
             "microchip_no"=>"required|min:3|max:50",
             "address"=>"required|max:10000",
-            'email' => "required|max:30|min:11|email|unique:users,email,{$request->id}",
+            'email' => "required|max:100|email|unique:users,email,{$request->id}",
             "phone"=>"required|min:3|max:30",
             "id"=>"required|numeric|exists:users,id|between:1,999999999",
             'image' => 'nullable|array',

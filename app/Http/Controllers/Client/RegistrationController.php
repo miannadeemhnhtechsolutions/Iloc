@@ -40,7 +40,7 @@ class RegistrationController extends Controller
             "address"=>"required|max:10000",
             "email"=>"required|unique:users|email|max:100|min:1",
             "phone"=>"required|min:3|max:30",
-            "password"=>"required|min:4|max:16",
+            "password"=>"required|min:4|max:50",
 //            'image' => 'required|array|min:1',
 //            'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
 

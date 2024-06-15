@@ -15,14 +15,14 @@ class ProfileController extends Controller
 //    abc
     public function update(Request $request){
         $validator = Validator::make($request->all(), [
-            "first_name"=>"required|min:3|max:50",
-            "last_name"=>"required|min:3|max:50",
+            "first_name"=>"required|min:1|max:100",
+            "last_name"=>"required|min:1|max:100",
             "address"=>"required|max:10000",
 //            "password"=>"required|min:4|max:16",
 //            'image' => 'nullable|array',
 //            'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 //            'email' => "required|max:30|min:11|email|unique:users,email,{$request->user()->id}",
-            "phone"=>"required|min:3|max:30",
+            "phone"=>"required|min:1|max:30",
 
 
         ]);
