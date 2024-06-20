@@ -65,17 +65,20 @@ Route::middleware(['auth:api'])->group( function () {
     Route::post('client/logout',[\App\Http\Controllers\Client\AuthenticationController::class,'logout']);
 
 });
+Route::post('client/store/form',[\App\Http\Controllers\Client\InitiativeTwoController::class,'store']);
+
 Route::middleware(['auth:api'])->group( function () {
 Route::middleware(['Subscription-package'])->group( function () {
     Route::post('client/update/profile',[\App\Http\Controllers\Client\ProfileController::class,'update']);
     Route::get('client/view/profile',[\App\Http\Controllers\Client\ProfileController::class,'profile']);
     Route::post('client/update/password',[\App\Http\Controllers\Client\ProfileController::class,'updatePassword']);
     Route::get('client/get/subscription/details',[\App\Http\Controllers\Client\ProfileController::class,'subscription_details']);
-    Route::post('client/store/form',[\App\Http\Controllers\Client\InitiativeTwoController::class,'store']);
+
     Route::post('client/update/form',[\App\Http\Controllers\Client\InitiativeTwoController::class,'update']);
     Route::delete('client/del/form/{id}',[\App\Http\Controllers\Client\InitiativeTwoController::class,'destroy']);
     Route::get('client/get/form',[\App\Http\Controllers\Client\InitiativeTwoController::class,'index']);
 
 //    Route::get('client/check/subscription/status',[\App\Http\Controllers\Client\SubscriptionController::class,'checkSubscription']);
 });
+
 });

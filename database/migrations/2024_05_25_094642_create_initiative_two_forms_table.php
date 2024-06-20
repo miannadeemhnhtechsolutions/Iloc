@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('initiative_two_forms', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('organization_name');
             $table->string('organization_city');
             $table->string('organization_state');
@@ -42,7 +42,14 @@ return new class extends Migration
             $table->string('beau_sponsoring_organization')->nullable();
             $table->string('beau_city')->nullable();
             $table->string('beau_state')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+//            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+$table->string('type_of_service')->nullalbe();
+$table->string('name_individual_business')->nullable();
+$table->string('city')->nullable();
+$table->string('state')->nullable();
+$table->string('email')->nullable();
+$table->string('website')->nullable();
             $table->timestamps();
         });
     }

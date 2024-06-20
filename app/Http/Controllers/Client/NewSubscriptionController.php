@@ -56,6 +56,21 @@ class NewSubscriptionController extends Controller
 
         }
         $user_id=$request->user()->id;
+        $today_date=Carbon::now()->format('Y-m-d');
+        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        if ($checkSubscriptions){
+           if ($checkSubscriptions->expiry_date > $today_date){
+               $response = [
+                   'status' => false,
+                   'message' => "You have already active subscription",
+
+               ];
+               return response()->json($response, 404);
+           }
+        }
+
+
+
         $findPlan=NewPlan::where('id',$request->plan_id)->first();
         $price=$findPlan->price;
 
@@ -92,7 +107,8 @@ class NewSubscriptionController extends Controller
             }else{
                 $newDateTime = Carbon::now()->addYear(1);
             }
-            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id,'new_plan_id'=>$request->plan_id])->first();
+//            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id,'new_plan_id'=>$request->plan_id])->first();
+            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id])->first();
             $start_date= Carbon::now()->format('Y-m-d');
             if ($subscription){
                 $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",

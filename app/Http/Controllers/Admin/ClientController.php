@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 class ClientController extends Controller
 {
     public function index(){
-        $users=User::where('role_id', '!=',1)->get();
+        $users=User::where('role_id', '!=',1)->with('package_subscription')->with('package_subscription.plan')->get();
         $response = [
             'status' => true,
             'data'    => $users,

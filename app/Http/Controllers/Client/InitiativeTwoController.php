@@ -42,6 +42,12 @@ class InitiativeTwoController extends Controller
             'beau_sponsoring_organization' => 'required|string|max:255',
             'beau_city' => 'required|string|max:255',
             'beau_state' => 'required|string|max:255',
+            'type_of_service' => 'required|string|max:100',
+            'name_individual_business' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'email' => 'required|string|max:100|email',
+            'website' => 'required|string|max:255|url',
         ]);
         if($validated_data->fails()){
 
@@ -57,7 +63,7 @@ class InitiativeTwoController extends Controller
         }
 
         $data = $validated_data->validated();
-        $data['user_id'] = $request->user()->id;
+//        $data['user_id'] = $request->user()->id;
         $presentationData = InitiativeTwoForm::create($data);
         $response = [
             'status' => true,
@@ -100,6 +106,12 @@ class InitiativeTwoController extends Controller
             'beau_sponsoring_organization' => 'required|string|max:255',
             'beau_city' => 'required|string|max:255',
             'beau_state' => 'required|string|max:255',
+            'type_of_service' => 'required|string|max:100',
+            'name_individual_business' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'email' => 'required|string|max:100|email',
+            'website' => 'required|string|max:255|url',
             "id"=>'numeric|required|exists:initiative_two_forms,id',
         ]);
         if($validated_data->fails()){

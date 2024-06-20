@@ -23,7 +23,10 @@ class InitiativeTwoForm extends Model
 
         // Former Beau fields
         'beau_name_at_presentation', 'beau_escort_name', 'beau_year_presented',
-        'beau_sponsoring_organization', 'beau_city', 'beau_state','user_id',
+        'beau_sponsoring_organization', 'beau_city', 'beau_state','user_id','type_of_service',
+        'name_individual_business','city','state','email','website'
+
+
     ];
     public function users()
     {
