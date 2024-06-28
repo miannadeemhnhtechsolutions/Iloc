@@ -161,6 +161,19 @@ class NewSubscriptionController extends Controller
 
         }
         $user_id=$request->user()->id;
+        $today_date=Carbon::now()->format('Y-m-d');
+        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        if ($checkSubscriptions){
+            if ($checkSubscriptions->expiry_date > $today_date){
+                $response = [
+                    'status' => false,
+                    'message' => "You have already active subscription",
+
+                ];
+                return response()->json($response, 404);
+            }
+        }
+        $user_id=$request->user()->id;
 //        dd(1);
 //        dd(Auth::user());
         $payer = new Payer();
