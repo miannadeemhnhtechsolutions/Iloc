@@ -12,7 +12,7 @@ class InitiativeTwoController extends Controller
 {
     public function index()
     {
-        $data=InitiativeTwoForm::with('users')->get();
+        $data=InitiativeTwoForm::get();
 
         $response = [
             'status' => true,

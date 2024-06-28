@@ -54,8 +54,9 @@ class NewSubscriptionController extends Controller
             'plan_id' => 'required|numeric|exists:new_plans,id',
             "payment_method"=>"required|string",
             "email"=>"required|email",
-            "first_name"=>"required",
-            "last_name"=>"required",
+            "name"=>"required",
+            "city"=>"required",
+            'state'=>"required",
             "address"=>"required",
         ]);
         if($validator->fails()){
@@ -75,8 +76,10 @@ class NewSubscriptionController extends Controller
         $today_date = Carbon::now()->format('Y-m-d');
         $today_date=Carbon::now()->format('Y-m-d');
         $email=$request->email;
-        $firstName=$request->first_name;
-        $lastName=$request->last_name;
+        $name=$request->name;
+        $city=$request->city;
+        $state=$request->state;
+//        $address=$request->address;
         $address=$request->address;
         $today_date=Carbon::now()->format('Y-m-d');
         $checkSubscriptions=NewSubscriptionPlan::where('email',$email)->first();
@@ -136,12 +139,10 @@ class NewSubscriptionController extends Controller
 
             if ($subscription){
                 $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'email'=>$email,'first_name'=>$firstName,
-                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
+                    'email'=>$email,'name'=>$name, 'city'=>$city,'state'=>$state,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }else{
                 $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'email'=>$email,'first_name'=>$firstName,
-                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
+                    'email'=>$email,'name'=>$name, 'city'=>$city,'state'=>$state,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }
             $secret=env('STRIPE_SECRET');
             $public=env('STRIPE_KEY');
@@ -161,8 +162,9 @@ class NewSubscriptionController extends Controller
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|numeric|exists:new_plans,id',
             "email"=>"required|email",
-            "first_name"=>"required",
-            "last_name"=>"required",
+            "name"=>"required",
+            "city"=>"required",
+            "state"=>"required",
             "address"=>"required",
         ]);
         if($validator->fails()){
@@ -207,16 +209,17 @@ class NewSubscriptionController extends Controller
         $transaction = new Transaction();
         $transaction->setAmount($amount);
         $email=$request->email;
-        $fistName=$request->first_name;
-        $lastName=$request->last_name;
+        $name=$request->name;
+        $city=$request->city;
+        $state=$request->state;
         $address=$request->address;
 
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();
 //        $redirectUrls->setReturnUrl(url('payment/success/'.$request->plan_id.'/'.$user_id.'/'))
 //            ->setCancelUrl(url('payment/cancel/'.$request->plan_id.'/'.$user_id.'/'));
-        $redirectUrls->setReturnUrl('https://iloc.dev-bt.xyz/success/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$fistName.'/'.$lastName.'/'.$address.'/')
-            ->setCancelUrl('https://iloc.dev-bt.xyz/error/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$fistName.'/'.$lastName.'/'.$address.'/');
+        $redirectUrls->setReturnUrl('https://iloc.dev-bt.xyz/success/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$name.'/'.$city.'/'.$state.'/'.$address.'/')
+            ->setCancelUrl('https://iloc.dev-bt.xyz/error/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$name.'/'.$city.'/'.$state.'/'.$address.'/');
 //dd(1);
         $payment = new Payment();
         $payment->setIntent('sale')
@@ -265,7 +268,7 @@ class NewSubscriptionController extends Controller
 
     }
 
-    public function paymentSuccess(Request $request,$plan_id,$uniqueTransactionId,$email,$firstName,$lastName,$address)
+    public function paymentSuccess(Request $request,$plan_id,$uniqueTransactionId,$email,$name,$city,$state,$address)
     {
         // Check if payment is successful
         if ($request->input('paymentId') && $request->input('PayerID')) {
@@ -292,12 +295,12 @@ class NewSubscriptionController extends Controller
                 $start_date= Carbon::now()->format('Y-m-d');
 
                 if ($subscription){
-                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'first_name'=>$firstName,
-                        'last_name'=>$lastName,'address'=>$address,'status'=>"active",
+                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'name'=>$name,
+                        'city'=>$city,'state'=>$state,'address'=>$address,'status'=>"active",
                         'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }else{
                     $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
-                        'first_name'=>$firstName, 'last_name'=>$lastName,'address'=>$address,
+                        'name'=>$name, 'city'=>$city,'state'=>$state,'address'=>$address,
                         'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }
                 $secret=env('PAYPAL_CLIENT_SECRET');
@@ -322,7 +325,7 @@ class NewSubscriptionController extends Controller
         }
     }
 
-    public function paymentCancel($plan_id,$userID)
+    public function paymentCancel(Request $request,$plan_id,$uniqueTransactionId,$email,$name,$city,$state,$address)
 
     {
 

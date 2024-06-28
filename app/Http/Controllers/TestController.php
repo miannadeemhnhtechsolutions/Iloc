@@ -28,8 +28,9 @@ class TestController extends Controller
             'plan_id' => 'required|numeric|exists:new_plans,id',
             "payment_method"=>"required|string",
             "email"=>"required|email",
-            "first_name"=>"required",
-            "last_name"=>"required",
+            "name"=>"required",
+            "city"=>"required",
+            "state"=>"required",
             "address"=>"required",
 
         ]);
@@ -50,8 +51,9 @@ class TestController extends Controller
         $today_date = Carbon::now()->format('Y-m-d');
         $today_date=Carbon::now()->format('Y-m-d');
         $email=$request->email;
-        $firstName=$request->first_name;
-        $lastName=$request->last_name;
+        $name=$request->name;
+        $city=$request->city;
+        $state=$request->state;
         $address=$request->address;
 
         $checkSubscriptions=NewSubscriptionPlan::where('email',$email)->first();
@@ -112,12 +114,11 @@ class TestController extends Controller
 
             if ($subscription){
                 $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'email'=>$email,'first_name'=>$firstName,
-                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
+                    'email'=>$email,'name'=>$name, 'city'=>$city,'state'=>$state,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }else{
                 $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'email'=>$email,'first_name'=>$firstName,
-                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
+                    'email'=>$email,'name'=>$name,
+                    'city'=>$city,'state'=>$state,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }
             $secret=env('STRIPE_SECRET');
             $public=env('STRIPE_KEY');

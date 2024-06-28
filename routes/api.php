@@ -61,8 +61,8 @@ Route::get('client/get/all/plans',[\App\Http\Controllers\Client\NewSubscriptionC
 
     Route::post('client/subscribe/to/plan/stripe',[\App\Http\Controllers\Client\NewSubscriptionController::class,'subscribe_package']);
     Route::post('client/subscribe/to/plan/paypal',[\App\Http\Controllers\Client\NewSubscriptionController::class,'handlePayment']);
-    Route::post('/payment/success/{planID}/{transactionID}/{emailID}/{firstName}/{lastName}/{address}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentSuccess']);
-    Route::post('/payment/cancel/{planID}/{transactionID}/{emailID}/{firstName}/{lastName}/{address}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentCancel']);
+    Route::post('/payment/success/{planID}/{transactionID}/{emailID}/{name}/{city}/{state}/{address}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentSuccess']);
+    Route::post('/payment/cancel/{planID}/{transactionID}/{emailID}/{name}/{city}/{state}/{address}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentCancel']);
 
 
     Route::post('client/logout',[\App\Http\Controllers\Client\AuthenticationController::class,'logout']);

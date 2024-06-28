@@ -40,7 +40,7 @@ public function update_status(Request $request){
 
 }
 public function index(){
-    $data=NewSubscriptionPlan::with('user','plan')->get();
+    $data=NewSubscriptionPlan::with('plan')->get();
     $response = [
         'status' => true,
         'data'=>$data,
