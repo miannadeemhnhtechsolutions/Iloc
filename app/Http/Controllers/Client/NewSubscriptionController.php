@@ -23,7 +23,19 @@ use Stripe\Stripe;
 class NewSubscriptionController extends Controller
 {
 
+    private $apiContext;
 
+    public function __construct()
+    {
+        // Set up PayPal API context
+        $this->apiContext = new ApiContext(
+            new OAuthTokenCredential(env('PAYPAL_CLIENT_ID'), env('PAYPAL_CLIENT_SECRET'))
+        );
+        $this->apiContext->setConfig([
+            'mode' => 'sandbox', // Change to 'live' for production
+        ]);
+    }
+//    abc
 
 
 
@@ -170,8 +182,8 @@ class NewSubscriptionController extends Controller
         $redirectUrls = new \PayPal\Api\RedirectUrls();
 //        $redirectUrls->setReturnUrl(url('payment/success/'.$request->plan_id.'/'.$user_id.'/'))
 //            ->setCancelUrl(url('payment/cancel/'.$request->plan_id.'/'.$user_id.'/'));
-        $redirectUrls->setReturnUrl('https://Pet-avengers.dev-bt.xyz/success/'.$request->plan_id.'/'.$user_id.'/')
-            ->setCancelUrl('https://Pet-avengers.dev-bt.xyz/error/'.$request->plan_id.'/'.$user_id.'/');
+        $redirectUrls->setReturnUrl('https://iloc.dev-bt.xyz/success/'.$request->plan_id.'/'.$user_id.'/')
+            ->setCancelUrl('https://iloc.dev-bt.xyz/error/'.$request->plan_id.'/'.$user_id.'/');
 //dd(1);
         $payment = new Payment();
         $payment->setIntent('sale')
@@ -179,6 +191,13 @@ class NewSubscriptionController extends Controller
             ->setTransactions([$transaction])
             ->setRedirectUrls($redirectUrls);
 //dd(2);
+//        dd(1);
+        \Log::info('Payment Data:', [
+            'intent' => 'sale',
+            'payer' => $payer->toArray(),
+            'transactions' => [$transaction->toArray()],
+            'redirectUrls' => $redirectUrls->toArray(),
+        ]);
         try {
             $createdPayment = $payment->create($this->apiContext);
 

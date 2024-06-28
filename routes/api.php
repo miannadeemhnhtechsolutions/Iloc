@@ -60,12 +60,21 @@ Route::middleware(['auth:api'])->group( function () {
 
 
     Route::post('client/subscribe/to/plan/stripe',[\App\Http\Controllers\Client\NewSubscriptionController::class,'subscribe_package']);
+    Route::post('client/subscribe/to/plan/paypal',[\App\Http\Controllers\Client\NewSubscriptionController::class,'handlePayment']);
+    Route::post('/payment/success/{planID}/{userID}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentSuccess']);
+    Route::post('/payment/cancel/{planID}/{userID}', [\App\Http\Controllers\Client\NewSubscriptionController::class,'paymentCancel']);
 
 
     Route::post('client/logout',[\App\Http\Controllers\Client\AuthenticationController::class,'logout']);
 
 });
 Route::post('client/store/form',[\App\Http\Controllers\Client\InitiativeTwoController::class,'store']);
+Route::post('client/store/participant/organization/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_organization_form']);
+Route::post('client/store/participant/female/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_female_form']);
+Route::post('client/store/participant/male/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_male_form']);
+Route::post('client/store/participant/business/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_business_form']);
+
+
 
 Route::middleware(['auth:api'])->group( function () {
 Route::middleware(['Subscription-package'])->group( function () {
