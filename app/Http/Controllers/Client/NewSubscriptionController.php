@@ -53,6 +53,10 @@ class NewSubscriptionController extends Controller
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|numeric|exists:new_plans,id',
             "payment_method"=>"required|string",
+            "email"=>"required|email",
+            "first_name"=>"required",
+            "last_name"=>"required",
+            "address"=>"required",
         ]);
         if($validator->fails()){
 
@@ -67,9 +71,15 @@ class NewSubscriptionController extends Controller
 
 
         }
-        $user_id=$request->user()->id;
+        $uniqueTransactionId = uniqid('txn_', true);
+        $today_date = Carbon::now()->format('Y-m-d');
         $today_date=Carbon::now()->format('Y-m-d');
-        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        $email=$request->email;
+        $firstName=$request->first_name;
+        $lastName=$request->last_name;
+        $address=$request->address;
+        $today_date=Carbon::now()->format('Y-m-d');
+        $checkSubscriptions=NewSubscriptionPlan::where('email',$email)->first();
         if ($checkSubscriptions){
            if ($checkSubscriptions->expiry_date > $today_date){
                $response = [
@@ -89,7 +99,7 @@ class NewSubscriptionController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         try {
-            $existing_customer = Customer::all(['email' => $request->user()->email])->data;
+            $existing_customer = Customer::all(['email' => $email])->data;
 
             if (count($existing_customer) > 0) {
                 // Use the existing customer's ID
@@ -97,7 +107,7 @@ class NewSubscriptionController extends Controller
             } else {
 
                 $customer = Customer::create([
-                    'email' => $request->user()->email,
+                    'email' => $email,
 
                 ]);
                 $customer_id = $customer->id;
@@ -110,29 +120,33 @@ class NewSubscriptionController extends Controller
                 'description' => $findPlan->description,
                 'confirmation_method' => 'manual',
                 'confirm' => true,
-                'return_url' => 'https://petavengers.dev-mn.xyz/',
+                'return_url' => 'https://iloc.dev-mn.xyz/',
                 'customer' => $customer_id,
             ]);
             $find_plan=NewPlan::where('id',$request->plan_id)->first();
             if ($find_plan->interval=="month"){
                 $newDateTime = Carbon::now()->addDays(30);
+
             }else{
                 $newDateTime = Carbon::now()->addYear(1);
+
             }
-//            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id,'new_plan_id'=>$request->plan_id])->first();
-            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id])->first();
+            $subscription=NewSubscriptionPlan::where(['email'=>$email,'new_plan_id'=>$request->plan_id])->first();
             $start_date= Carbon::now()->format('Y-m-d');
+
             if ($subscription){
                 $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'user_id'=>$user_id]);
+                    'email'=>$email,'first_name'=>$firstName,
+                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }else{
                 $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'user_id'=>$user_id]);
+                    'email'=>$email,'first_name'=>$firstName,
+                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }
             $secret=env('STRIPE_SECRET');
             $public=env('STRIPE_KEY');
             $payment_record= NewPaymentMethod::create(['name'=>'Stripe','slug'=>'stripe','public_key'=>$public,'secret_key'=>$secret,
-                'is_active'=>1,'subscription_id'=>$subscription->id]);
+                'is_active'=>1,'subscription_id'=>$subscription->id,'transaction_id'=>$uniqueTransactionId]);
             return response()->json(['message' => 'subscription successful']);
         } catch (\Exception $e) {
 
@@ -146,6 +160,10 @@ class NewSubscriptionController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|numeric|exists:new_plans,id',
+            "email"=>"required|email",
+            "first_name"=>"required",
+            "last_name"=>"required",
+            "address"=>"required",
         ]);
         if($validator->fails()){
 
@@ -160,9 +178,8 @@ class NewSubscriptionController extends Controller
 
 
         }
-        $user_id=$request->user()->id;
         $today_date=Carbon::now()->format('Y-m-d');
-        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        $checkSubscriptions=NewSubscriptionPlan::where('email',$request->email)->first();
         if ($checkSubscriptions){
             if ($checkSubscriptions->expiry_date > $today_date){
                 $response = [
@@ -172,8 +189,7 @@ class NewSubscriptionController extends Controller
                 ];
                 return response()->json($response, 404);
             }
-        }
-        $user_id=$request->user()->id;
+        } $uniqueTransactionId = uniqid('txn_', true);
 //        dd(1);
 //        dd(Auth::user());
         $payer = new Payer();
@@ -190,13 +206,17 @@ class NewSubscriptionController extends Controller
 
         $transaction = new Transaction();
         $transaction->setAmount($amount);
+        $email=$request->email;
+        $fistName=$request->first_name;
+        $lastName=$request->last_name;
+        $address=$request->address;
 
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();
 //        $redirectUrls->setReturnUrl(url('payment/success/'.$request->plan_id.'/'.$user_id.'/'))
 //            ->setCancelUrl(url('payment/cancel/'.$request->plan_id.'/'.$user_id.'/'));
-        $redirectUrls->setReturnUrl('https://iloc.dev-bt.xyz/success/'.$request->plan_id.'/'.$user_id.'/')
-            ->setCancelUrl('https://iloc.dev-bt.xyz/error/'.$request->plan_id.'/'.$user_id.'/');
+        $redirectUrls->setReturnUrl('https://iloc.dev-bt.xyz/success/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$fistName.'/'.$lastName.'/'.$address.'/')
+            ->setCancelUrl('https://iloc.dev-bt.xyz/error/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$fistName.'/'.$lastName.'/'.$address.'/');
 //dd(1);
         $payment = new Payment();
         $payment->setIntent('sale')
@@ -245,7 +265,7 @@ class NewSubscriptionController extends Controller
 
     }
 
-    public function paymentSuccess(Request $request,$plan_id,$userID)
+    public function paymentSuccess(Request $request,$plan_id,$uniqueTransactionId,$email,$firstName,$lastName,$address)
     {
         // Check if payment is successful
         if ($request->input('paymentId') && $request->input('PayerID')) {
@@ -268,15 +288,17 @@ class NewSubscriptionController extends Controller
                     $newDateTime = Carbon::now()->addYear(1);
 
                 }
-                $subscription=NewSubscriptionPlan::where(['user_id'=>$userID,'new_plan_id'=>$plan_id])->first();
+                $subscription=NewSubscriptionPlan::where(['email'=>$email,'new_plan_id'=>$plan_id])->first();
                 $start_date= Carbon::now()->format('Y-m-d');
 
                 if ($subscription){
-                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
-                        'user_id'=>$userID]);
+                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'first_name'=>$firstName,
+                        'last_name'=>$lastName,'address'=>$address,'status'=>"active",
+                        'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }else{
                     $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
-                        'user_id'=>$userID]);
+                        'first_name'=>$firstName, 'last_name'=>$lastName,'address'=>$address,
+                        'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }
                 $secret=env('PAYPAL_CLIENT_SECRET');
                 $public=env('PAYPAL_CLIENT_ID');

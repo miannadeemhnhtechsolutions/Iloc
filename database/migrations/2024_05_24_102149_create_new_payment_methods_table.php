@@ -21,6 +21,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(0);
             $table->string('paymentId')->nullable();
             $table->string('PayerID')->nullable();
+            $table->string('email')->nullable();
+            $table->string('transaction_id')->nullable();
             $table->foreign('subscription_id')->references('id')->on('new_subscription_plans');
             $table->timestamps();
         });

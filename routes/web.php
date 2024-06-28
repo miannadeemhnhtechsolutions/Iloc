@@ -26,6 +26,6 @@ Route::post('/login', [\App\Http\Controllers\TestController::class,'login']);
 
 Route::get('show/form',[\App\Http\Controllers\Client\PayPalController::class,'index']);
 Route::post('/payment', [\App\Http\Controllers\Client\PayPalController::class,'handlePayment']);
-Route::get('/payment/success/{planID}/{userID}', [\App\Http\Controllers\Client\PayPalController::class,'paymentSuccess']);
-Route::get('/payment/cancel/{planID}/{userID}', [\App\Http\Controllers\Client\PayPalController::class,'paymentCancel']);
+Route::get('/payment/success/{planID}/{transactionID}/{emailID}/{firstName}/{lastName}/{address}', [\App\Http\Controllers\Client\PayPalController::class,'paymentSuccess']);
+Route::get('/payment/cancel/{planID}/{transactionID}/{emailID}/{firstName}/{lastName}/{address}', [\App\Http\Controllers\Client\PayPalController::class,'paymentCancel']);
 //paypalEnd

@@ -27,6 +27,11 @@ class TestController extends Controller
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|numeric|exists:new_plans,id',
             "payment_method"=>"required|string",
+            "email"=>"required|email",
+            "first_name"=>"required",
+            "last_name"=>"required",
+            "address"=>"required",
+
         ]);
         if($validator->fails()){
 
@@ -41,9 +46,15 @@ class TestController extends Controller
 
 
         }
-        $user_id=Auth::user()->id;
+        $uniqueTransactionId = uniqid('txn_', true);
+        $today_date = Carbon::now()->format('Y-m-d');
         $today_date=Carbon::now()->format('Y-m-d');
-        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        $email=$request->email;
+        $firstName=$request->first_name;
+        $lastName=$request->last_name;
+        $address=$request->address;
+
+        $checkSubscriptions=NewSubscriptionPlan::where('email',$email)->first();
         if ($checkSubscriptions){
             if ($checkSubscriptions->expiry_date > $today_date){
                 $response = [
@@ -54,7 +65,7 @@ class TestController extends Controller
                 return response()->json($response, 404);
             }
         }
-        $user_id=Auth::user()->id;
+
         $findPlan=NewPlan::where('id',$request->plan_id)->first();
         $price=$findPlan->price;
 
@@ -62,7 +73,7 @@ class TestController extends Controller
 
         try {
             // Create a charge
-            $existing_customer = Customer::all(['email' => Auth::user()->email])->data;
+            $existing_customer = Customer::all(['email' => $email])->data;
 
             if (count($existing_customer) > 0) {
                 // Use the existing customer's ID
@@ -70,8 +81,8 @@ class TestController extends Controller
             } else {
 
                 $customer = Customer::create([
-                    'email' => Auth::user()->email,
-
+                    'email' => $email,
+                    'payment_method' => $request->payment_method,
                 ]);
                 $customer_id = $customer->id;
             }
@@ -96,21 +107,23 @@ class TestController extends Controller
                 $newDateTime = Carbon::now()->addYear(1);
 
             }
-            $subscription=NewSubscriptionPlan::where(['user_id'=>$user_id,'new_plan_id'=>$request->plan_id])->first();
+            $subscription=NewSubscriptionPlan::where(['email'=>$email,'new_plan_id'=>$request->plan_id])->first();
             $start_date= Carbon::now()->format('Y-m-d');
 
             if ($subscription){
                 $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'user_id'=>$user_id]);
+                    'email'=>$email,'first_name'=>$firstName,
+                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }else{
                 $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$request->plan_id,'status'=>"active",
-                    'user_id'=>$user_id]);
+                    'email'=>$email,'first_name'=>$firstName,
+                    'last_name'=>$lastName,'address'=>$address,'transaction_id'=>$uniqueTransactionId]);
             }
             $secret=env('STRIPE_SECRET');
             $public=env('STRIPE_KEY');
 
             $payment_record= NewPaymentMethod::create(['name'=>'Stripe','slug'=>'stripe','public_key'=>$public,'secret_key'=>$secret,
-                'is_active'=>1,'subscription_id'=>$subscription->id]);
+                'is_active'=>1,'subscription_id'=>$subscription->id,'transaction_id'=>$uniqueTransactionId]);
 
             return response()->json(['message' => 'subscription successful']);
         } catch (\Exception $e) {

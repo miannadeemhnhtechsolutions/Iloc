@@ -51,7 +51,11 @@
                     },
                     body: JSON.stringify({
                         payment_method: paymentMethodId,
-                        plan_id: 1
+                        plan_id: 1,
+                        first_name: "muhammad",
+                        last_name: 'nadeem',
+                        email: "mnadeem00064@gmail.com",
+                        address: "abcxyzSialkot"
                     })
                 })
                     .then(response => response.json())

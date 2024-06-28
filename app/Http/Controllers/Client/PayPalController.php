@@ -39,9 +39,14 @@ class PayPalController extends Controller
 
     public function handlePayment(Request $request)
     {
+//        dd(Auth::user());
 
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|numeric|exists:new_plans,id',
+            "email"=>"required|email",
+            "first_name"=>"required",
+            "last_name"=>"required",
+            "address"=>"required",
         ]);
         if($validator->fails()){
 
@@ -56,9 +61,9 @@ class PayPalController extends Controller
 
 
         }
-        $user_id=Auth::user()->id;
+
         $today_date=Carbon::now()->format('Y-m-d');
-        $checkSubscriptions=NewSubscriptionPlan::where('user_id',$user_id)->first();
+        $checkSubscriptions=NewSubscriptionPlan::where('email',$request->email)->first();
         if ($checkSubscriptions){
             if ($checkSubscriptions->expiry_date > $today_date){
                 $response = [
@@ -69,7 +74,9 @@ class PayPalController extends Controller
                 return response()->json($response, 404);
             }
         }
-        $user_id=Auth::user()->id;
+//        $user_id=Auth::user()->id;
+        $uniqueTransactionId = uniqid('txn_', true);
+        $today_date = Carbon::now()->format('Y-m-d');
 //        dd(1);
 //        dd(Auth::user());
         $payer = new Payer();
@@ -78,7 +85,7 @@ class PayPalController extends Controller
         $amount = new Amount();
         $findPlan=NewPlan::where('id',$request->plan_id)->first();
         $price=$findPlan->price;
-        $price = number_format($findPlan->price, 2, '.', '');
+        $price = $findPlan->price . ".00";
 //        dd($price);
 //        dd($request->amount);
         $amount->setTotal($price);
@@ -86,11 +93,15 @@ class PayPalController extends Controller
 
         $transaction = new Transaction();
         $transaction->setAmount($amount);
+        $email=$request->email;
+        $fistName=$request->first_name;
+        $lastName=$request->last_name;
+        $address=$request->address;
 
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();
-        $redirectUrls->setReturnUrl(url('/payment/success/'.$request->plan_id.'/'.$user_id.'/'))
-            ->setCancelUrl(url('/payment/cancel/'.$request->plan_id.'/'.$user_id.'/'));
+        $redirectUrls->setReturnUrl(url('/payment/success/'.$request->plan_id.'/'.$uniqueTransactionId .'/'.$email.'/'.$fistName.'/'.$lastName.'/'.$address.'/'))
+            ->setCancelUrl(url('/payment/cancel/'.$request->plan_id.'/'.$uniqueTransactionId.'/'.$email .'/'.$fistName.'/'.$lastName.'/'.$address.'/'));
 //dd(1);
         $payment = new Payment();
         $payment->setIntent('sale')
@@ -123,7 +134,7 @@ class PayPalController extends Controller
 
     }
 
-    public function paymentSuccess(Request $request,$plan_id,$userID)
+    public function paymentSuccess(Request $request,$plan_id,$uniqueTransactionId,$email,$firstName,$lastName,$address)
     {
         // Check if payment is successful
         if ($request->input('paymentId') && $request->input('PayerID')) {
@@ -146,21 +157,34 @@ class PayPalController extends Controller
                     $newDateTime = Carbon::now()->addYear(1);
 
                 }
-                $subscription=NewSubscriptionPlan::where(['user_id'=>$userID,'new_plan_id'=>$plan_id])->first();
+                $subscription=NewSubscriptionPlan::where(['email'=>$email,'new_plan_id'=>$plan_id])->first();
                 $start_date= Carbon::now()->format('Y-m-d');
 
                 if ($subscription){
-                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
-                        'user_id'=>$userID]);
+                    $subscription->update(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'first_name'=>$firstName,
+                        'last_name'=>$lastName,'address'=>$address,'status'=>"active",
+                        'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }else{
                     $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
-                        'user_id'=>$userID]);
+                        'first_name'=>$firstName, 'last_name'=>$lastName,'address'=>$address,
+                        'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
                 }
+//                $start_date = Carbon::now()->format('Y-m-d');
+//                $subscription = NewSubscriptionPlan::create([
+//                    'start_date' => $start_date,
+//                    'expiry_date' => $newDateTime,
+//                    'new_plan_id' => $plan_id,
+//                    'status' => "active",
+////                    'user_id'=>1,
+//                    'transaction_id' => $uniqueTransactionId,
+//                    'email'=>$email,
+//                ]);
                 $secret=env('PAYPAL_CLIENT_SECRET');
                 $public=env('PAYPAL_CLIENT_ID');
 
                 $payment_record= NewPaymentMethod::create(['name'=>'PayPal','slug'=>'paypal','public_key'=>$public,'secret_key'=>$secret,
-                    'is_active'=>1,'subscription_id'=>$subscription->id,'paymentId'=>$request->input('paymentId'),'PayerID'=>$request->input('PayerID')]);
+                    'is_active'=>1,'subscription_id'=>$subscription->id,'paymentId'=>$request->input('paymentId'),'PayerID'=>$request->input('PayerID'),
+                        'transaction_id' => $uniqueTransactionId,'email'=>$email]);
 
                 $response = [
                     'status' => true,
@@ -178,7 +202,7 @@ class PayPalController extends Controller
         }
     }
 
-    public function paymentCancel($plan_id,$userID)
+    public function paymentCancel(Request $request,$plan_id,$uniqueTransactionId,$email,$firstName,$lastName,$address)
 
     {
 

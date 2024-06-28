@@ -23,7 +23,7 @@ class PlanSeeder extends Seeder
 //        $table->string('interval');
 
         NewPlan::create([
-            'user_id'=>1,
+//            'user_id'=>1,
             'name' => 'Plan 1',
             'slug' => 'individual or businesses',
             'price'=>50,
@@ -32,7 +32,7 @@ class PlanSeeder extends Seeder
 
         ]);
         NewPlan::create([
-            'user_id'=>1,
+//            'user_id'=>1,
             'name' => 'Plan 2',
             'slug' => 'cotillion organizations, clubs, groups and foundations',
             'price'=>100,

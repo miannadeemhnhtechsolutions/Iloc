@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('new_subscription_plans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+//            $table->unsignedBigInteger('user_id');
             $table->date('start_date');
             $table->date('expiry_date');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('address');
             $table->unsignedBigInteger('new_plan_id');
             $table->foreign('new_plan_id')->references('id')->on('new_plans')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+//            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('status');
+            $table->string('email')->nullable();
+            $table->string('transaction_id')->nullable();
 
             $table->timestamps();
         });
