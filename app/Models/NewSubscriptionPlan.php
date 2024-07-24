@@ -16,6 +16,11 @@ class NewSubscriptionPlan extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id','id');
+        return $this->belongsTo(User::class, 'organization_email','email');
+    }
+    public function payment_details()
+    {
+        return $this->hasMany(NewPaymentMethod::class,'email','email');
+
     }
 }

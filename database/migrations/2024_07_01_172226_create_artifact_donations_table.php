@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('participant_business_forms', function (Blueprint $table) {
+        Schema::create('artifact_donations', function (Blueprint $table) {
             $table->id();
-            $table->string('type_of_service')->nullable();
-            $table->string('name_individual_business')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
+
+
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('email')->nullable();
-            $table->string('website')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('artifact')->nullable();
+            $table->string('organization')->nullable();
+
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('participant_business_forms');
+        Schema::dropIfExists('artifact_donations');
     }
 };

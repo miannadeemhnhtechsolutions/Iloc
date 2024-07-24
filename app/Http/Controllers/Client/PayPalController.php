@@ -99,6 +99,11 @@ class PayPalController extends Controller
         $city=$request->city;
         $state=$request->state;
         $address=$request->address;
+        $address = rawurlencode($address);
+        $name = rawurlencode($name);
+        $city = rawurlencode($city);
+        $state = rawurlencode($state);
+        $email = rawurlencode($email);
 
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();

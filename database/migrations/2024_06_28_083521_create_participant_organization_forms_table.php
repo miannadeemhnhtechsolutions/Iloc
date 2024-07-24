@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('organization_state');
             $table->string('organization_email')->nullable();
             $table->string('organization_website')->nullable();
-            $table->year('organization_established_year');
+            $table->year('organization_established_year')->nullable();
             $table->year('organization_year')->nullable();
             $table->string('organization_age')->nullable();
-            $table->boolean('organization_is_active');
-            $table->enum('organization_presentation_type', ['debutantes', 'beaus', 'both','males','females','other']);
-            $table->enum('organization_presentation_frequency', ['annually', 'biannually']);
-            $table->enum('organization_participation_method', ['invite', 'referral', 'open']);
+            $table->boolean('organization_is_active')->nullable();
+            $table->enum('organization_presentation_type', ['debutantes', 'beaus', 'both','males','females','other'])->nullable();
+            $table->enum('organization_presentation_frequency', ['annually', 'biannually'])->nullable();
+            $table->enum('organization_participation_method', ['invite', 'referral', 'open'])->nullable();
             $table->timestamps();
         });
     }

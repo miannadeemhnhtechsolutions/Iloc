@@ -32,7 +32,7 @@ class NewSubscriptionController extends Controller
             new OAuthTokenCredential(env('PAYPAL_CLIENT_ID'), env('PAYPAL_CLIENT_SECRET'))
         );
         $this->apiContext->setConfig([
-            'mode' => 'sandbox', // Change to 'live' for production
+            'mode' => 'live', // Change from 'sandbox' to 'live' for production
         ]);
     }
 //    abc
@@ -147,7 +147,7 @@ class NewSubscriptionController extends Controller
             $secret=env('STRIPE_SECRET');
             $public=env('STRIPE_KEY');
             $payment_record= NewPaymentMethod::create(['name'=>'Stripe','slug'=>'stripe','public_key'=>$public,'secret_key'=>$secret,
-                'is_active'=>1,'subscription_id'=>$subscription->id,'transaction_id'=>$uniqueTransactionId]);
+                'is_active'=>1,'subscription_id'=>$subscription->id,'transaction_id'=>$uniqueTransactionId, 'email'=>$email]);
             return response()->json(['message' => 'subscription successful']);
         } catch (\Exception $e) {
 
@@ -213,6 +213,11 @@ class NewSubscriptionController extends Controller
         $city=$request->city;
         $state=$request->state;
         $address=$request->address;
+        $address = rawurlencode($address);
+        $name = rawurlencode($name);
+        $city = rawurlencode($city);
+        $state = rawurlencode($state);
+        $email = rawurlencode($email);
 
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();
@@ -279,6 +284,17 @@ class NewSubscriptionController extends Controller
 
             $execution = new \PayPal\Api\PaymentExecution();
             $execution->setPayerId($payerId);
+//            return $request->all();
+
+            $plan_id=$request->input('planId');
+            $email=$request->input('email');
+            $name=$request->input('name');
+            $city=$request->input('city');
+            $state=$request->input('state');
+            $address=$request->input('address');
+            $uniqueTransactionId=$request->input('txnId');
+
+
 
             try {
                 $result = $payment->execute($execution, $this->apiContext);
@@ -301,13 +317,13 @@ class NewSubscriptionController extends Controller
                 }else{
                     $subscription= NewSubscriptionPlan::create(['start_date'=>$start_date,'expiry_date'=>$newDateTime,'new_plan_id'=>$plan_id,'status'=>"active",
                         'name'=>$name, 'city'=>$city,'state'=>$state,'address'=>$address,
-                        'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
+                        'email'=>$email,'transaction_id'=>$uniqueTransactionId,]);
                 }
                 $secret=env('PAYPAL_CLIENT_SECRET');
                 $public=env('PAYPAL_CLIENT_ID');
 
                 $payment_record= NewPaymentMethod::create(['name'=>'PayPal','slug'=>'paypal','public_key'=>$public,'secret_key'=>$secret,
-                    'is_active'=>1,'subscription_id'=>$subscription->id,'paymentId'=>$request->input('paymentId'),'PayerID'=>$request->input('PayerID')]);
+                    'is_active'=>1,'subscription_id'=>$subscription->id,'paymentId'=>$request->input('paymentId'),'PayerID'=>$request->input('PayerID'),'email'=>$email,'transaction_id'=>$uniqueTransactionId]);
 
                 $response = [
                     'status' => true,

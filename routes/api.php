@@ -50,6 +50,19 @@ Route::middleware(['auth:api'])->group( function () {
     Route::get('admin/get/form/with/user/{id}',[\App\Http\Controllers\Admin\InitiativeTwoController::class,'get_form_with_user']);
     Route::post('admin/update/form',[\App\Http\Controllers\Admin\InitiativeTwoController::class,'update_form']);
     Route::delete('admin/del/form/{id}',[\App\Http\Controllers\Admin\InitiativeTwoController::class,'destroy']);
+    Route::get('admin/get/all/artifacts',[\App\Http\Controllers\Admin\ArtifactDonationController::class,'index']);
+    Route::post('admin/del/artifact',[\App\Http\Controllers\Admin\ArtifactDonationController::class,'del_art']);
+    Route::get('admin/get/participant/organization/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'get_organization_form']);
+    Route::get('admin/get/participant/female/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'get_female']);
+    Route::get('admin/get/participant/male/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'get_male']);
+    Route::get('admin/get/participant/business/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'get_business']);
+    Route::post('admin/del/participant/org/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'del_org']);
+    Route::post('admin/del/participant/male/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'del_male']);
+    Route::post('admin/del/participant/female/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'del_female']);
+    Route::post('admin/del/participant/business/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'del_business']);
+    Route::post('admin/change/organization/form/activation',[\App\Http\Controllers\Admin\ParticipantFormController::class,'change_status']);
+
+
 
 
 
@@ -73,6 +86,7 @@ Route::post('client/store/participant/organization/form',[\App\Http\Controllers\
 Route::post('client/store/participant/female/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_female_form']);
 Route::post('client/store/participant/male/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_male_form']);
 Route::post('client/store/participant/business/form',[\App\Http\Controllers\Client\ParticipantFormController::class,'store_business_form']);
+Route::post('client/add/artifact/donation',[\App\Http\Controllers\Client\ArtifactDonationController::class,'store']);
 
 
 

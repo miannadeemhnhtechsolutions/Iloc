@@ -5,7 +5,7 @@
     <input type="hidden" name="email" value="mnadeem00064@gmail.com">
     <input type="hidden" name="name" value="muhammad">
     <input type="hidden" name="city" value="punslk">
-    <input type="hidden" name="state" value="punjab">
-    <input type="hidden" name="address" value="abcsialkot">
+    <input type="hidden" name="state" value="punjab hgh">
+    <input type="hidden" name="address" value="abcsialkot hbhhj">
     <button type="submit">Pay with PayPal</button>
 </form>
