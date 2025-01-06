@@ -23,5 +23,10 @@ class RoleSeeder extends Seeder
             'slug' => 'client',
 
         ]);
+        Role::create([
+            'name' => 'Sub Admin',
+            'slug' => 'Sub admin',
+
+        ]);
     }
 }

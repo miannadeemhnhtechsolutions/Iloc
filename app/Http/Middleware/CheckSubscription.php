@@ -35,7 +35,7 @@ class CheckSubscription
 
             $response = [
                 'status' => false,
-                'message' => "Subscription period has benn expired",
+                'message' => "Subscription period has been expired",
 
             ];
             return response()->json($response, 404);

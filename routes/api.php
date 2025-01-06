@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\NewsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,25 @@ Route::middleware(['auth:api'])->group( function () {
     Route::post('admin/del/participant/business/form',[\App\Http\Controllers\Admin\ParticipantFormController::class,'del_business']);
     Route::post('admin/change/organization/form/activation',[\App\Http\Controllers\Admin\ParticipantFormController::class,'change_status']);
 
+    Route::post('admin/add/user',[\App\Http\Controllers\Admin\UserController::class,'store']);
+    Route::get('admin/get/all/users',[\App\Http\Controllers\Admin\UserController::class,'index']);
+    Route::get('admin/get/user/{id}',[\App\Http\Controllers\Admin\UserController::class,'single_user']);
+    Route::post('admin/update/user',[\App\Http\Controllers\Admin\UserController::class,'update']);
+    Route::get('admin/del/user/{id}',[\App\Http\Controllers\Admin\UserController::class,'del_user']);
+//    news data
+
+    Route::get('admin/get/all/news',[\App\Http\Controllers\Admin\NewsController::class,'index']);
+    Route::post('admin/store/news/data',[\App\Http\Controllers\Admin\NewsController::class,'store']);
+    Route::get('admin/get/single/news/{id}',[\App\Http\Controllers\Admin\NewsController::class,'edit']);
+    Route::post('admin/update/news/data',[\App\Http\Controllers\Admin\NewsController::class,'update']);
+    Route::delete('admin/del/news/{id}',[\App\Http\Controllers\Admin\NewsController::class,'destroy']);
+
+
+
+
+
+//    Route::post('admin/change/user/status',[\App\Http\Controllers\Admin\UserController::class,'change_user_status']);
+
 
 
 
@@ -69,6 +89,7 @@ Route::middleware(['auth:api'])->group( function () {
 
 });
 Route::get('client/get/all/plans',[\App\Http\Controllers\Client\NewSubscriptionController::class,'all_plans']);
+Route::get('client/get/all/news/data',[\App\Http\Controllers\Client\NewsController::class,'index']);
 //Route::middleware(['auth:api'])->group( function () {
 
 

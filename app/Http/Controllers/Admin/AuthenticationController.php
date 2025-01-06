@@ -39,7 +39,7 @@ class AuthenticationController extends Controller
         if (Auth::attempt([$field => $loginIdentifier, 'password' => $request->password])) {
 
             $user = Auth::user();
-            if ($user->role_id==1){
+            if ($user->role_id==1 || $user->role_id==3 ){
                 $token=  $user->createToken('PPA')->accessToken;
                 $response=array(
                     'status'=>true,
